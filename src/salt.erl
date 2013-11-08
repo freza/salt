@@ -39,7 +39,8 @@
 
 -export([crypto_hash/1, crypto_verify_16/2, crypto_verify_32/2]).
 
--include_lib("salt/include/salt.hrl").
+%% -include_lib("salt/include/salt.hrl").
+-include("salt.hrl").
 
 %%% Public-key cryptography.
 

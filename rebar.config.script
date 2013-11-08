@@ -3,36 +3,14 @@
 %%% flags and paths for NIF compilation.
 %%%
 
-{ok, Host} = inet:gethostname(),
-{ok, Cwd} = file:get_cwd(),
 Arch = erlang:system_info(system_architecture),
 
-%% Refer to build/${host}/bin/okabi and okcompilers/abiname.c under NaCl directory
-%% for further mappings. Should be an entirely mechanical process as long as Erlang
-%% and NaCl both build.
-case Arch of
-    "x86_64" ++ _ ->
-        Incdir = filename:join([Cwd, "c_src", "nacl-20110221", "build", Host, "include", "amd64"]),
-        Libdir = filename:join([Cwd, "c_src", "nacl-20110221", "build", Host, "lib", "amd64"]),
-	Abi = "-m64";
-    "i386" ++ _ ->
-        Incdir = filename:join([Cwd, "c_src", "nacl-20110221", "build", Host, "include", "x86"]),
-        Libdir = filename:join([Cwd, "c_src", "nacl-20110221", "build", Host, "lib", "x86"]),
-	Abi = "-m32";
-    _ ->
-        Incdir = filename:join([Cwd, "c_src", "nacl-20110221", "build", Host, "include"]),
-        Libdir = filename:join([Cwd, "c_src", "nacl-20110221", "build", Host, "lib"]),
-	Abi = ""
-end,
-
 %% Augment configuration from rebar.config with NIF settings.
-%% XXXXXX Aaargh, nacl won't link against shared libs. Use libsodium instead.
 lists:keymerge(1,
     lists:keysort(1, [
-        {port_env, [{"DRV_CFLAGS", lists:flatten(["$DRV_CFLAGS ", Abi, " -Wall -Werror -I", Incdir])},
-		    {"DRV_LDFLAGS", lists:flatten(["$DRV_LDFLAGS ", Abi, " ", Libdir, "/libnacl.a"])}]},
-%%        {port_env, [{"DRV_CFLAGS", lists:flatten(["$DRV_CFLAGS ", Abi, " -Wall -Werror -I", Incdir, " ", Libdir, "/libnacl.a"])},
-%%		    {"DRV_LDFLAGS", lists:flatten(["$DRV_LDFLAGS ", Abi])}]},
-        {port_specs, [{filename:join(["priv", Arch, "salt_nif.so"]), ["c_src/salt_nif.c"]}]}
+        {port_env, [{"DRV_CFLAGS", "$DRV_CFLAGS -Wall -Werror -I/usr/local/include/sodium"},
+		    {"DRV_LDFLAGS", "$DRV_LDFLAGS -lsodium"}]},
+        {port_specs, [{filename:join(["priv", Arch, "salt_nif.so"]), ["c_src/salt_nif.c"]}]},
+        {pre_hooks, [{clean, "rm -fr ebin erl_crash.dump c_src/salt_nif.o priv/" ++ Arch}]}
     ]),
     lists:keysort(1, CONFIG)).

@@ -112,10 +112,10 @@ struct salt_msg {
 
 static nif_type_t 		*salt_pcb_type = NULL;
 
-static const uint8_t 		crypto_secretbox_zerobytes[crypto_secretbox_ZEROBYTES] = {0,}; 		/* C99 */
-static const uint8_t 		crypto_secretbox_boxzerobytes[crypto_secretbox_BOXZEROBYTES] = {0,}; 	/* C99 */
-static const uint8_t 		crypto_box_boxzerobytes[crypto_box_BOXZEROBYTES] = {0,}; 		/* C99 */
-static const uint8_t 		crypto_box_zerobytes[crypto_box_ZEROBYTES] = {0,}; 			/* C99 */
+static const uint8_t 		salt_secretbox_zerobytes[crypto_secretbox_ZEROBYTES] = {0,}; 		/* C99 */
+static const uint8_t 		salt_secretbox_boxzerobytes[crypto_secretbox_BOXZEROBYTES] = {0,}; 	/* C99 */
+static const uint8_t 		salt_box_boxzerobytes[crypto_box_BOXZEROBYTES] = {0,}; 			/* C99 */
+static const uint8_t 		salt_box_zerobytes[crypto_box_ZEROBYTES] = {0,}; 			/* C99 */
 
 /* Slightly more readable this way. Variable 'hp' always calling process' heap. */
 #define BADARG 			enif_make_badarg(hp)
@@ -242,7 +242,7 @@ salt_box(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	/* Check constraints on size and zero prefixing. */
 	if (pt.size < crypto_box_ZEROBYTES || pt.size > SALT_MAX_MESSAGE_SIZE)
 		return (BADARG);
-	if (memcmp((const void *)pt.data, &crypto_box_zerobytes[0], crypto_box_ZEROBYTES) != 0)
+	if (memcmp((const void *)pt.data, &salt_box_zerobytes[0], crypto_box_ZEROBYTES) != 0)
 		return (BADARG);
 
 	if (nc.size != crypto_box_NONCEBYTES)
@@ -299,7 +299,7 @@ salt_box_open(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	/* Check constraints on size and zero prefixing. */
 	if (ct.size < crypto_box_BOXZEROBYTES || ct.size > SALT_MAX_MESSAGE_SIZE)
 		return (BADARG);
-	if (memcmp((const void *)ct.data, &crypto_box_boxzerobytes[0], crypto_box_BOXZEROBYTES) != 0)
+	if (memcmp((const void *)ct.data, &salt_box_boxzerobytes[0], crypto_box_BOXZEROBYTES) != 0)
 		return (BADARG);
 
 	if (nc.size != crypto_box_NONCEBYTES)
@@ -390,7 +390,7 @@ salt_box_afternm(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	/* Check constraints on size and zero prefixing. */
 	if (pt.size < crypto_box_ZEROBYTES || pt.size > SALT_MAX_MESSAGE_SIZE)
 		return (BADARG);
-	if (memcmp((const void *)pt.data, &crypto_box_zerobytes[0], crypto_box_ZEROBYTES) != 0)
+	if (memcmp((const void *)pt.data, &salt_box_zerobytes[0], crypto_box_ZEROBYTES) != 0)
 		return (BADARG);
 
 	if (nc.size != crypto_box_NONCEBYTES)
@@ -441,7 +441,7 @@ salt_box_open_afternm(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	/* Check constraints on size and zero prefixing. */
 	if (ct.size < crypto_box_BOXZEROBYTES || ct.size > SALT_MAX_MESSAGE_SIZE)
 		return (BADARG);
-	if (memcmp((const void *)ct.data, &crypto_box_boxzerobytes[0], crypto_box_BOXZEROBYTES) != 0)
+	if (memcmp((const void *)ct.data, &salt_box_boxzerobytes[0], crypto_box_BOXZEROBYTES) != 0)
 		return (BADARG);
 
 	if (nc.size != crypto_box_NONCEBYTES)
@@ -667,7 +667,7 @@ salt_secretbox(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	/* Check constraints on size and zero prefixing. */
 	if (pt.size < crypto_secretbox_ZEROBYTES || pt.size > SALT_MAX_MESSAGE_SIZE)
 		return (BADARG);
-	if (memcmp((const void *)pt.data, &crypto_secretbox_zerobytes[0], crypto_secretbox_ZEROBYTES) != 0)
+	if (memcmp((const void *)pt.data, &salt_secretbox_zerobytes[0], crypto_secretbox_ZEROBYTES) != 0)
 		return (BADARG);
 
 	if (nc.size != crypto_secretbox_NONCEBYTES)
@@ -716,7 +716,7 @@ salt_secretbox_open(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	/* Check constraints on size and zero prefixing. */
 	if (ct.size < crypto_secretbox_BOXZEROBYTES || pt.size > SALT_MAX_MESSAGE_SIZE)
 		return (BADARG);
-	if (memcmp((const void *)ct.data, &crypto_secretbox_boxzerobytes[0], crypto_secretbox_BOXZEROBYTES) != 0)
+	if (memcmp((const void *)ct.data, &salt_secretbox_boxzerobytes[0], crypto_secretbox_BOXZEROBYTES) != 0)
 		return (BADARG);
 
 	if (nc.size != crypto_secretbox_NONCEBYTES)
