@@ -1,0 +1,6 @@
+#!/bin/sh -ex
+
+export PATH="${HOME}/R16B01/bin/erl:${PATH}"
+
+../rebar.git/rebar clean
+../rebar.git/rebar compile

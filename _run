@@ -1,0 +1,6 @@
+#!/bin/sh -ex
+
+${HOME}/R16B01/bin/erl -pa $(pwd)/ebin -boot start_sasl -noshell \
+	-eval 'c:c(salt_test).' \
+	-eval 'salt_test:all().' \
+	-eval 'init:stop().'
