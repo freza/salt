@@ -29,7 +29,7 @@
 -behaviour(gen_server).
 
 -export([start_link/0]).
--export([make_box_keypair/0, make_sign_keypair/0]).
+-export([make_box_keypair/0, make_sign_keypair/0, make_random_bytes/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 %%%
@@ -53,6 +53,14 @@ make_sign_keypair() ->
 	    exit({salt, crypto_sign_keypair, Rsn})
     end.
 
+make_random_bytes(Cnt) ->
+    case gen_server:call(?MODULE, {make_random_bytes, Cnt}) of
+	{ok, Bytes} ->
+	    Bytes;
+	{error, Rsn} ->
+	    exit({salt, crypto_random_bytes, Rsn})
+    end.
+
 %%%
 
 -record(state, {
@@ -65,18 +73,34 @@ init([]) ->
     {ok, #state{pcb = Pcb}}.
 
 handle_call(make_box_keypair, {Pid, Mref}, #state{pcb = Pcb} = State) ->
-    case salt_nif:salt_box_keypair(Pcb, Pid, Mref) of
+    try salt_nif:salt_box_keypair(Pcb, Pid, Mref) of
 	enqueued ->
 	    {noreply, State};
 	Error ->
 	    {reply, {error, Error}, State}
+    catch
+	error : badarg ->
+	    {reply, {error, badarg}, State}
     end;
 handle_call(make_sign_keypair, {Pid, Mref}, #state{pcb = Pcb} = State) ->
-    case salt_nif:salt_sign_keypair(Pcb, Pid, Mref) of
+    try salt_nif:salt_sign_keypair(Pcb, Pid, Mref) of
 	enqueued ->
 	    {noreply, State};
 	Error ->
 	    {reply, {error, Error}, State}
+    catch
+	error : badarg ->
+	    {reply, {error, badarg}, State}
+    end;
+handle_call({make_random_bytes, Cnt}, {Pid, Mref}, #state{pcb = Pcb} = State) ->
+    try salt_nif:salt_random_bytes(Pcb, Pid, Mref, Cnt) of
+	enqueued ->
+	    {noreply, State};
+	Error ->
+	    {reply, {error, Error}, State}
+    catch
+	error : badarg ->
+	    {reply, {error, badarg}, State}
     end;
 handle_call(_, _, State) ->
     {reply, {error, bad_request}, State}.

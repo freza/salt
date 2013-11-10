@@ -38,6 +38,7 @@
 -export([crypto_onetimeauth/2, crypto_onetimeauth_verify/3]).
 
 -export([crypto_hash/1, crypto_verify_16/2, crypto_verify_32/2]).
+-export([crypto_random_bytes/1]).
 
 %% -include_lib("salt/include/salt.hrl").
 -include("salt.hrl").
@@ -61,7 +62,7 @@ crypto_box_afternm(Plain_text, Nonce, Context) ->
     salt_nif:salt_box_afternm([crypto_box_zerobytes() | Plain_text], Nonce, Context).
 
 crypto_box_open_afternm(Cipher_text, Nonce, Context) ->
-    salt_nif:salt_box_open_afternm(Cipher_text, Nonce, Context).
+    salt_nif:salt_box_open_afternm([crypto_box_boxzerobytes() | Cipher_text], Nonce, Context).
 
 %% Scalar multiplication. NB: Opaque representation of integers and group elements on fixed-length octet strings.
 crypto_scalarmult(Integer, Group_p) ->
@@ -122,6 +123,10 @@ crypto_verify_16(Bin_x, Bin_y) ->
 
 crypto_verify_32(Bin_x, Bin_y) ->
     salt_nif:salt_verify_32(Bin_x, Bin_y).
+
+%% Random number generator.
+crypto_random_bytes(Cnt) ->
+    salt_server:make_random_bytes(Cnt).
 
 %%% Implementation.
 

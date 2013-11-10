@@ -33,6 +33,12 @@
 #include <stdint.h>
 #include <string.h>
 
+#define DEBUG 0
+#if DEBUG == 1
+#include <sys/uio.h>
+#include <unistd.h>
+#endif
+
 #include <crypto_box.h>
 #include <crypto_scalarmult_curve25519.h> 	/* XXXjh crypto_scalarmult.h missing */
 #include <crypto_sign.h>
@@ -43,6 +49,7 @@
 #include <crypto_hash.h>
 #include <crypto_verify_16.h>
 #include <crypto_verify_32.h>
+#include <randombytes.h>
 
 /* XXXjh crypto_scalarmult.h missing */
 #define crypto_scalarmult_SCALARBYTES 	crypto_scalarmult_curve25519_SCALARBYTES
@@ -100,11 +107,12 @@ struct salt_msg {
 	nif_pid_t 		msg_from;
 	nif_term_t 		msg_mref;
 	nif_term_t 		msg_reply; 		/* Response tuple. */
+	uint_t 			msg_aux; 		/* Auxiliary data, used by RANDOMBYTES_REQ. */
 };
 
 #define SALT_MSG_BOXKEYPAIR_REQ		1
 #define SALT_MSG_SIGNKEYPAIR_REQ 	2
-#define SALT_MSG_KEY_RSP 		3
+#define SALT_MSG_RANDOMBYTES_REQ 	3
 
 /*
  * Globals.
@@ -124,10 +132,11 @@ static const uint8_t 		salt_box_zerobytes[crypto_box_ZEROBYTES] = {0,}; 			/* C9
  * Forward decls.
  */
 
-static nif_term_t salt_enqueue_req(nif_heap_t *, struct salt_pcb *, nif_pid_t, nif_term_t, uint_t);
+static nif_term_t salt_enqueue_req(nif_heap_t *, struct salt_pcb *, nif_pid_t, nif_term_t, uint_t, uint_t);
 static void *salt_worker_loop(void *);
 static void salt_handle_req(struct salt_pcb *, struct salt_msg *);
 static void salt_reply_keypair(struct salt_msg *, nif_bin_t *, nif_bin_t *);
+static void salt_reply_bytes(struct salt_msg *, nif_bin_t *);
 static void salt_reply_error(struct salt_msg *, const char *);
 
 /*
@@ -208,7 +217,7 @@ salt_box_keypair(nif_heap_t *hp, int argc, const nif_term_t argv[])
 		return (BADARG);
 	ref = argv[2];
 
-	return (salt_enqueue_req(hp, sc, pid, ref, SALT_MSG_BOXKEYPAIR_REQ));
+	return (salt_enqueue_req(hp, sc, pid, ref, SALT_MSG_BOXKEYPAIR_REQ, 0));
 }
 
 static nif_term_t
@@ -316,7 +325,7 @@ salt_box_open(nif_heap_t *hp, int argc, const nif_term_t argv[])
 		return (BADARG);
 
 	/* Perform the crypto, strip leading zeros and return rest if authentic. */
-	if (crypto_box_open(ct.data, pt.data, ct.size, nc.data, pk.data, sk.data) != 0) {
+	if (crypto_box_open(pt.data, ct.data, ct.size, nc.data, pk.data, sk.data) != 0) {
 		enif_release_binary(&pt);
 
 		return (enif_make_atom(hp, "forged_or_garbled"));
@@ -372,7 +381,6 @@ salt_box_afternm(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	nif_bin_t 		ct;
 	nif_term_t 		raw;
 	nif_term_t 		sub;
-	nif_term_t 		tag;
 
 	if (argc != 3)
 		return (BADARG);
@@ -407,10 +415,9 @@ salt_box_afternm(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	(void)crypto_box_afternm(ct.data, pt.data, pt.size, nc.data, bn.data);
 
 	raw = enif_make_binary(hp, &ct);
-	sub = enif_make_sub_binary(hp, raw, crypto_box_ZEROBYTES, ct.size - crypto_box_ZEROBYTES);
-	tag = enif_make_atom(hp, "ok");
+	sub = enif_make_sub_binary(hp, raw, crypto_box_BOXZEROBYTES, ct.size - crypto_box_BOXZEROBYTES);
 
-	return (enif_make_tuple2(hp, tag, sub));
+	return (sub);
 }
 
 static nif_term_t
@@ -549,7 +556,7 @@ salt_sign_keypair(nif_heap_t *hp, int argc, const nif_term_t argv[])
 		return (BADARG);
 	ref = argv[2];
 
-	return (salt_enqueue_req(hp, sc, pid, ref, SALT_MSG_SIGNKEYPAIR_REQ));
+	return (salt_enqueue_req(hp, sc, pid, ref, SALT_MSG_SIGNKEYPAIR_REQ, 0));
 }
 
 static nif_term_t
@@ -630,7 +637,7 @@ salt_sign_open(nif_heap_t *hp, int argc, const nif_term_t argv[])
 
 		return (enif_make_atom(hp, "forged_or_garbled"));
 	}
-	raw = enif_make_binary(hp, &sm);
+	raw = enif_make_binary(hp, &pm);
 	tag = enif_make_atom(hp, "ok");
 
 	if (len != sm.size)
@@ -699,6 +706,7 @@ salt_secretbox_open(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	nif_bin_t 		pt;
 	nif_term_t 		raw;
 	nif_term_t 		sub;
+	nif_term_t 		tag;
 
 	if (argc != 3)
 		return (BADARG);
@@ -738,8 +746,9 @@ salt_secretbox_open(nif_heap_t *hp, int argc, const nif_term_t argv[])
 
 	raw = enif_make_binary(hp, &pt);
 	sub = enif_make_sub_binary(hp, raw, crypto_secretbox_ZEROBYTES, ct.size - crypto_secretbox_ZEROBYTES);
+	tag = enif_make_atom(hp, "ok");
 
-	return (sub);
+	return (enif_make_tuple2(hp, tag, sub));
 }
 
 static nif_term_t
@@ -1037,12 +1046,45 @@ salt_verify_32(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	return (enif_make_atom(hp, "equal"));
 }
 
+static nif_term_t
+salt_random_bytes(nif_heap_t *hp, int argc, const nif_term_t argv[])
+{
+	/* salt_random_bytes(Pcb, From_pid, From_ref, Cnt) -> enqueued | congested | exiting. */
+	struct salt_pcb 	*sc;
+	nif_pid_t 		pid;
+	nif_term_t 		ref;
+	uint_t 			cnt;
+
+	if (argc != 4)
+		return (BADARG);
+
+	/* Unpack arguments, check types. */
+	if (! enif_get_resource(hp, argv[0], salt_pcb_type, (void **)&sc))
+		return (BADARG);
+
+	if (! enif_get_local_pid(hp, argv[1], &pid))
+		return (BADARG);
+
+	if (! enif_is_ref(hp, argv[2]))
+		return (BADARG);
+	ref = argv[2];
+
+	/* Get requested size, make sure it's in bounds. */
+	if (! enif_get_uint(hp, argv[3], &cnt))
+		return (BADARG);
+	if (cnt < 1 || cnt > SALT_MAX_MESSAGE_SIZE)
+		return (BADARG);
+
+	return (salt_enqueue_req(hp, sc, pid, ref, SALT_MSG_RANDOMBYTES_REQ, cnt));
+}
+
+
 /*
  * Implementation.
  */
 
 static nif_term_t
-salt_enqueue_req(nif_heap_t *hp, struct salt_pcb *sc, nif_pid_t pid, nif_term_t ref, uint_t type)
+salt_enqueue_req(nif_heap_t *hp, struct salt_pcb *sc, nif_pid_t pid, nif_term_t ref, uint_t type, uint_t aux)
 {
 	struct salt_msg 	*sm;
 	const char 		*err;
@@ -1059,6 +1101,7 @@ salt_enqueue_req(nif_heap_t *hp, struct salt_pcb *sc, nif_pid_t pid, nif_term_t 
 	sm->msg_from = pid; /* struct copy */
 	sm->msg_mref = enif_make_copy(sm->msg_heap, ref);
 	sm->msg_type = type;
+	sm->msg_aux = aux;
 
 	/* Enqueue request checking for failure scenarios. */
 	enif_mutex_lock(sc->sc_lock);
@@ -1096,6 +1139,9 @@ salt_worker_loop(void *arg)
 	struct salt_pcb 	*sc = arg;
 	struct salt_msg 	*sm;
 	struct salt_msg 	*tmp;
+
+	/* XXX initialization of libsodium */
+	/* XXX send readiness indication to owner */
 
 	/* Pick up next batch of work, react promptly to termination requests. */
  loop:
@@ -1138,6 +1184,7 @@ salt_handle_req(struct salt_pcb *sc, struct salt_msg *sm)
 	const char 		*err;
 	nif_bin_t 		pk;
 	nif_bin_t 		sk;
+	nif_bin_t 		rb;
 
 	/* Preemptive termination check via dirty read. */
 	if (sc->sc_exit_flag) {
@@ -1173,6 +1220,18 @@ salt_handle_req(struct salt_pcb *sc, struct salt_msg *sm)
 		
 		crypto_sign_keypair(pk.data, sk.data);
 		salt_reply_keypair(sm, &pk, &sk);
+		break;
+
+	case SALT_MSG_RANDOMBYTES_REQ:
+		if (! enif_alloc_binary(sm->msg_aux, &rb)) {
+			err = "enomem";
+			goto fail_0;
+		}
+
+		/* XXX not sure I want to rely on native RNG, but not sure either if salsa20 randombytes is kosher */
+		/* XXX probably best to write one that uses dev random but also encrypts output with stream cipher? */
+		randombytes_buf(rb.data, rb.size);
+		salt_reply_bytes(sm, &rb);
 		break;
 
 	default:
@@ -1214,6 +1273,25 @@ salt_reply_keypair(struct salt_msg *sm, nif_bin_t *pk, nif_bin_t *sk)
 }
 
 static void
+salt_reply_bytes(struct salt_msg *sm, nif_bin_t *bs)
+{
+	nif_heap_t 		*hp = sm->msg_heap;
+	nif_term_t 		tag;
+	nif_term_t 		res;
+	nif_term_t 		msg;
+	nif_term_t 		bb;
+
+	/* From_pid ! {Mref, {ok, Bytes}} */
+	bb = enif_make_binary(hp, bs);
+
+	tag = enif_make_atom(hp, "ok");
+	res = enif_make_tuple2(hp, tag, bb);
+	msg = enif_make_tuple2(hp, sm->msg_mref, res);
+
+	(void)enif_send(NULL, &sm->msg_from, hp, msg);
+}
+
+static void
 salt_reply_error(struct salt_msg *sm, const char *why)
 {
 	nif_heap_t 		*hp = sm->msg_heap;
@@ -1230,6 +1308,35 @@ salt_reply_error(struct salt_msg *sm, const char *why)
 
 	(void)enif_send(NULL, &sm->msg_from, hp, msg);
 }
+
+#if DEBUG == 1
+static void
+print_bytes(const char *tag, nif_bin_t *buf)
+{
+	static const char 	*alphabet = "0123456789ABCDEF";
+	uint_t 			cnt = (3 + 2*buf->size);
+	uint8_t 		str[cnt];
+	struct iovec  		iov[2];
+	int 			i;
+
+	/* XXX inlined UNCONST and ARRAYCOUNT... */
+	iov[0].iov_base = (void *)((ulong_t)(const void *)tag);
+	iov[0].iov_len = strlen(tag);
+	iov[1].iov_base = str;
+	iov[1].iov_len = cnt;
+	
+	str[0] = ' ';
+	str[1] = '0';
+	str[2] = 'x';
+
+	for (i = 0; i <= buf->size; i++) {
+		str[2*i + 3] = alphabet[buf->data[i] >> 4];
+		str[2*i + 4] = alphabet[buf->data[i] % 16];
+	}
+
+	(void)writev(STDERR_FILENO, (const void *)&iov[0], (sizeof(iov)/sizeof(iov[0])));
+}
+#endif /* DEBUG */
 
 /*
  * ERTS interface.
@@ -1287,8 +1394,7 @@ salt_load(nif_heap_t *hp, void **priv_data, nif_term_t load_info)
 
 static nif_func_t salt_exports[] = {
 	{"start", 0, start},
-	/* XXX {"stop", 0, stop}, */
-	{"salt_box_keypair", 2, salt_box_keypair},
+	{"salt_box_keypair", 3, salt_box_keypair},
 	{"salt_box", 4, salt_box},
 	{"salt_box_open", 4, salt_box_open},
 	{"salt_box_beforenm", 2, salt_box_beforenm},
@@ -1296,7 +1402,7 @@ static nif_func_t salt_exports[] = {
 	{"salt_box_open_afternm", 3, salt_box_open_afternm},
 	{"salt_scalarmult", 2, salt_scalarmult},
 	{"salt_scalarmult_base", 1, salt_scalarmult_base},
-	{"salt_sign_keypair", 2, salt_sign_keypair},
+	{"salt_sign_keypair", 3, salt_sign_keypair},
 	{"salt_sign", 2, salt_sign},
 	{"salt_sign_open", 2, salt_sign_open},
 	{"salt_secretbox", 3, salt_secretbox},
@@ -1310,6 +1416,7 @@ static nif_func_t salt_exports[] = {
 	{"salt_hash", 1, salt_hash},
 	{"salt_verify_16", 2, salt_verify_16},
 	{"salt_verify_32", 2, salt_verify_32},
+	{"salt_random_bytes", 4, salt_random_bytes},
 };
 
 ERL_NIF_INIT(salt_nif, salt_exports, salt_load, NULL, NULL, NULL)

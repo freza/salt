@@ -29,10 +29,10 @@
 
 -export([load/0, start/0]).
 
--export([salt_box_keypair/0, salt_box/4, salt_box_open/4, salt_box_beforenm/2]).
+-export([salt_box_keypair/3, salt_box/4, salt_box_open/4, salt_box_beforenm/2]).
 -export([salt_box_afternm/3, salt_box_open_afternm/3]).
 -export([salt_scalarmult/2, salt_scalarmult_base/1]).
--export([salt_sign_keypair/0, salt_sign/2, salt_sign_open/2]).
+-export([salt_sign_keypair/3, salt_sign/2, salt_sign_open/2]).
 
 -export([salt_secretbox/3, salt_secretbox_open/3]).
 -export([salt_stream/3, salt_stream_xor/3]).
@@ -40,6 +40,7 @@
 -export([salt_onetimeauth/2, salt_onetimeauth_verify/3]).
 
 -export([salt_hash/1, salt_verify_16/2, salt_verify_32/2]).
+-export([salt_random_bytes/4]).
 
 %%%
 
@@ -52,7 +53,7 @@ load() ->
 start() ->
     error(salt_not_loaded).
 
-salt_box_keypair() ->
+salt_box_keypair(_, _, _) ->
     error(salt_not_loaded).
 
 salt_box(_, _, _, _) ->
@@ -76,7 +77,7 @@ salt_scalarmult(_, _) ->
 salt_scalarmult_base(_) ->
     error(salt_not_loaded).
 
-salt_sign_keypair() ->
+salt_sign_keypair(_, _, _) ->
     error(salt_not_loaded).
 
 salt_sign(_, _) ->
@@ -116,4 +117,7 @@ salt_verify_16(_, _) ->
     error(salt_not_loaded).
 
 salt_verify_32(_, _) ->
+    error(salt_not_loaded).
+
+salt_random_bytes(_, _, _, _) ->
     error(salt_not_loaded).

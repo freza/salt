@@ -34,7 +34,7 @@
 
   crypto_sign(Message, Secret_key) -> Signed_msg.
 
-  crypto_sign_open(Signed_msg, Public_key) -> {ok, Verified_msg} | forgery.
+  crypto_sign_open(Signed_msg, Public_key) -> {ok, Verified_msg} | forged_or_garbled.
 
 ### Secret-key cryptography.
 
@@ -73,3 +73,7 @@
   crypto_verify_16(Bin_x, Bin_y) -> equal | not_equal.
 
   crypto_verify_32(Bin_x, Bin_y) -> equal | not_equal.
+
+## Random number generator.
+
+  crypto_random_bytes(Cnt) -> Bytes.

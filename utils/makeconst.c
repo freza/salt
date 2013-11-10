@@ -83,23 +83,23 @@ main(int argc, char *argv[])
 	printf("-define(CRYPTO_BOX_ZEROBYTES, 			%d).\n", crypto_box_ZEROBYTES);
 	printf("-define(CRYPTO_BOX_BOXZEROBYTES, 		%d).\n", crypto_box_BOXZEROBYTES);
 	printf("-define(CRYPTO_BOX_PRIMITIVE, 			%s).\n", crypto_box_PRIMITIVE);
-	printf("-define(CRYPTO_BOX_IMPLEMENTATION, 		\"%s\").\n", crypto_box_IMPLEMENTATION);
-	printf("-define(CRYPTO_BOX_VERSION, 			\"%s\").\n", crypto_box_VERSION);
+	// printf("-define(CRYPTO_BOX_IMPLEMENTATION, 		\"%s\").\n", crypto_box_IMPLEMENTATION);
+	// printf("-define(CRYPTO_BOX_VERSION, 			\"%s\").\n", crypto_box_VERSION);
 	printf("\n");
 
 	/* XXX crypto_scalarmult.h is missing! Using curve25519 directly. */
 	printf("-define(CRYPTO_SCALARMULT_BYTES, 		%d).\n", crypto_scalarmult_curve25519_BYTES);
 	printf("-define(CRYPTO_SCALARMULT_SCALARBYTES, 		%d).\n", crypto_scalarmult_curve25519_SCALARBYTES);
-	printf("-define(CRYPTO_SCALARMULT_IMPLEMENTATION, 	\"%s\").\n", crypto_scalarmult_curve25519_IMPLEMENTATION);
-	printf("-define(CRYPTO_SCALARMULT_VERSION, 		\"%s\").\n", crypto_scalarmult_curve25519_VERSION);
+	// printf("-define(CRYPTO_SCALARMULT_IMPLEMENTATION, 	\"%s\").\n", crypto_scalarmult_curve25519_IMPLEMENTATION);
+	// printf("-define(CRYPTO_SCALARMULT_VERSION, 		\"%s\").\n", crypto_scalarmult_curve25519_VERSION);
 	printf("\n");
 
 	printf("-define(CRYPTO_SIGN_BYTES, 			%d).\n", crypto_sign_BYTES);
 	printf("-define(CRYPTO_SIGN_PUBLICKEYBYTES, 		%d).\n", crypto_sign_PUBLICKEYBYTES);
 	printf("-define(CRYPTO_SIGN_SECRETKEYBYTES, 		%d).\n", crypto_sign_SECRETKEYBYTES);
 	printf("-define(CRYPTO_SIGN_PRIMITIVE, 			%s).\n", crypto_sign_PRIMITIVE);
-	printf("-define(CRYPTO_SIGN_IMPLEMENTATION, 		\"%s\").\n", crypto_sign_IMPLEMENTATION);
-	printf("-define(CRYPTO_SIGN_VERSION, 			\"%s\").\n", crypto_sign_VERSION);
+	// printf("-define(CRYPTO_SIGN_IMPLEMENTATION, 		\"%s\").\n", crypto_sign_IMPLEMENTATION);
+	// printf("-define(CRYPTO_SIGN_VERSION, 			\"%s\").\n", crypto_sign_VERSION);
 	printf("\n");
 
 	printf("-define(CRYPTO_SECRETBOX_KEYBYTES, 		%d).\n", crypto_secretbox_KEYBYTES);
@@ -107,35 +107,35 @@ main(int argc, char *argv[])
 	printf("-define(CRYPTO_SECRETBOX_ZEROBYTES, 		%d).\n", crypto_secretbox_ZEROBYTES);
 	printf("-define(CRYPTO_SECRETBOX_BOXZEROBYTES, 		%d).\n", crypto_secretbox_BOXZEROBYTES);
 	printf("-define(CRYPTO_SECRETBOX_PRIMITIVE, 		%s).\n", crypto_secretbox_PRIMITIVE);
-	printf("-define(CRYPTO_SECRETBOX_IMPLEMENTATION, 	\"%s\").\n", crypto_secretbox_IMPLEMENTATION);
-	printf("-define(CRYPTO_SECRETBOX_VERSION, 		\"%s\").\n", crypto_secretbox_VERSION);
+	// printf("-define(CRYPTO_SECRETBOX_IMPLEMENTATION, 	\"%s\").\n", crypto_secretbox_IMPLEMENTATION);
+	// printf("-define(CRYPTO_SECRETBOX_VERSION, 		\"%s\").\n", crypto_secretbox_VERSION);
 	printf("\n");
 
 	printf("-define(CRYPTO_STREAM_KEYBYTES, 		%d).\n", crypto_stream_KEYBYTES);
 	printf("-define(CRYPTO_STREAM_NONCEBYTES, 		%d).\n", crypto_stream_NONCEBYTES);
 	printf("-define(CRYPTO_STREAM_PRIMITIVE, 		%s).\n", crypto_stream_PRIMITIVE);
-	printf("-define(CRYPTO_STREAM_IMPLEMENTATION, 		\"%s\").\n", crypto_stream_IMPLEMENTATION);
-	printf("-define(CRYPTO_STREAM_VERSION, 			\"%s\").\n", crypto_stream_VERSION);
+	// printf("-define(CRYPTO_STREAM_IMPLEMENTATION, 		\"%s\").\n", crypto_stream_IMPLEMENTATION);
+	// printf("-define(CRYPTO_STREAM_VERSION, 			\"%s\").\n", crypto_stream_VERSION);
 	printf("\n");
 
 	printf("-define(CRYPTO_AUTH_BYTES, 			%d).\n", crypto_auth_BYTES);
 	printf("-define(CRYPTO_AUTH_KEYBYTES, 			%d).\n", crypto_auth_KEYBYTES);
 	printf("-define(CRYPTO_AUTH_PRIMITIVE, 			%s).\n", crypto_auth_PRIMITIVE);
-	printf("-define(CRYPTO_AUTH_IMPLEMENTATION, 		\"%s\").\n", crypto_auth_IMPLEMENTATION);
-	printf("-define(CRYPTO_AUTH_VERSION, 			\"%s\").\n", crypto_auth_VERSION);
+	// printf("-define(CRYPTO_AUTH_IMPLEMENTATION, 		\"%s\").\n", crypto_auth_IMPLEMENTATION);
+	// printf("-define(CRYPTO_AUTH_VERSION, 			\"%s\").\n", crypto_auth_VERSION);
 	printf("\n");
 
 	printf("-define(CRYPTO_ONETIMEAUTH_BYTES, 		%d).\n", crypto_onetimeauth_BYTES);
 	printf("-define(CRYPTO_ONETIMEAUTH_KEYBYTES, 		%d).\n", crypto_onetimeauth_KEYBYTES);
 	printf("-define(CRYPTO_ONETIMEAUTH_PRIMITIVE, 		%s).\n", crypto_onetimeauth_PRIMITIVE);
-	printf("-define(CRYPTO_ONETIMEAUTH_IMPLEMENTATION, 	\"%s\").\n", crypto_onetimeauth_IMPLEMENTATION);
-	printf("-define(CRYPTO_ONETIMEAUTH_VERSION, 		\"%s\").\n", crypto_onetimeauth_VERSION);
+	// printf("-define(CRYPTO_ONETIMEAUTH_IMPLEMENTATION, 	\"%s\").\n", crypto_onetimeauth_IMPLEMENTATION);
+	// printf("-define(CRYPTO_ONETIMEAUTH_VERSION, 		\"%s\").\n", crypto_onetimeauth_VERSION);
 	printf("\n");
 
 	printf("-define(CRYPTO_HASH_BYTES, 			%d).\n", crypto_hash_BYTES);
 	printf("-define(CRYPTO_HASH_PRIMITIVE, 			%s).\n", crypto_hash_PRIMITIVE);
-	printf("-define(CRYPTO_HASH_IMPLEMENTATION, 		\"%s\").\n", crypto_hash_IMPLEMENTATION);
-	printf("-define(CRYPTO_HASH_VERSION, 			\"%s\").\n", crypto_hash_VERSION);
+	// printf("-define(CRYPTO_HASH_IMPLEMENTATION, 		\"%s\").\n", crypto_hash_IMPLEMENTATION);
+	// printf("-define(CRYPTO_HASH_VERSION, 			\"%s\").\n", crypto_hash_VERSION);
 	printf("\n");
 
 	printf("-endif.\n");

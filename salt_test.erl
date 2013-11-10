@@ -39,8 +39,21 @@ all() ->
     end.
 
 orly() ->
+    io:nl(), io:nl(),
     title("Trying out crypto_box functions."),
-    box().
+    box(),
+    %% XXX how to test crypto_scalarmult?
+    title("Trying out crypto_sign functions."),
+    sign(),
+    title("Trying out crypto_secretbox functions."),
+    secretbox(),
+    title("Trying out crypto_stream functions."),
+    stream(),
+    title("Trying out crypto_auth functions."),
+    auth(),
+    title("Trying out crypto_onetimeauth functions."),
+    onetimeauth(),
+    title("Success.").
 
 %%%
 
@@ -67,11 +80,43 @@ boxprec(Apk, Ask, Bpk, Bsk, Nc, Pt) ->
     Ct = verbose(salt, crypto_box_afternm, [Pt, Nc, Ac]),
     compare({ok, Pt}, verbose(salt, crypto_box_open_afternm, [Ct, Nc, Bc])).
 
+sign() ->
+    {Pk, Sk} = verbose(salt, crypto_sign_keypair, []),
+    Pm = <<"Plain text to be signed.">>,
+    Sm = verbose(salt, crypto_sign, [Pm, Sk]),
+    compare({ok, Pm}, verbose(salt, crypto_sign_open, [Sm, Pk])).
+
+secretbox() ->
+    Sk = <<1:32/integer-unit:8>>,
+    Nc = <<1:24/integer-unit:8>>,
+    Pt = <<"Secret message.">>,
+    Ct = verbose(salt, crypto_secretbox, [Pt, Nc, Sk]),
+    compare({ok, Pt}, verbose(salt, crypto_secretbox_open, [Ct, Nc, Sk])).
+
+stream() ->
+    Sk = <<1:32/integer-unit:8>>,
+    Nc = <<1:24/integer-unit:8>>,
+    Pt = <<"Secret message.">>,
+    Ct = verbose(salt, crypto_stream_xor, [Pt, Nc, Sk]),
+    compare(Pt, verbose(salt, crypto_stream_xor, [Ct, Nc, Sk])).
+
+auth() ->
+    Sk = <<1:32/integer-unit:8>>,
+    Pt = <<"Authentic message.">>,
+    Au = verbose(salt, crypto_auth, [Pt, Sk]),
+    compare(authenticated, verbose(salt, crypto_auth_verify, [Au, Pt, Sk])).
+
+onetimeauth() ->
+    Sk = <<1:32/integer-unit:8>>,
+    Pt = <<"Authentic message.">>,
+    Au = verbose(salt, crypto_onetimeauth, [Pt, Sk]),
+    compare(authenticated, verbose(salt, crypto_onetimeauth_verify, [Au, Pt, Sk])).
+
 %%%
 
 compare(X, Y) when X /= Y ->
-    io:format("==== Unexpected result. ====~nLHS: ~1000p~nRHS: ~1000p~n~n", [X, Y]),
-    exit(failed);
+    io:format("==== Unexpected result. ====~n~s~s~n~n", [format(X, "LHS: "), format(Y, "RHS: ")]),
+    exit(salt_tests_failed);
 compare(_, _) ->
     ok.
 
@@ -96,7 +141,7 @@ format(X, S) ->
     io_lib:format("~s~132p~n", [S, X]).
 
 title(S) ->
-    io:format("~n### ~s~n~n", [S]).
+    io:format("==== ~s ====~n~n", [S]).
 
 bytes(B) ->
     [$0, $x | hexdump(B)].

@@ -35,50 +35,34 @@
 -define(CRYPTO_BOX_ZEROBYTES, 			32).
 -define(CRYPTO_BOX_BOXZEROBYTES, 		16).
 -define(CRYPTO_BOX_PRIMITIVE, 			curve25519xsalsa20poly1305).
--define(CRYPTO_BOX_IMPLEMENTATION, 		"crypto_box/curve25519xsalsa20poly1305/ref").
--define(CRYPTO_BOX_VERSION, 			"-").
 
 -define(CRYPTO_SCALARMULT_BYTES, 		32).
 -define(CRYPTO_SCALARMULT_SCALARBYTES, 		32).
--define(CRYPTO_SCALARMULT_IMPLEMENTATION, 	"crypto_scalarmult/curve25519/donna_c64").
--define(CRYPTO_SCALARMULT_VERSION, 		"-").
 
 -define(CRYPTO_SIGN_BYTES, 			64).
 -define(CRYPTO_SIGN_PUBLICKEYBYTES, 		32).
 -define(CRYPTO_SIGN_SECRETKEYBYTES, 		64).
--define(CRYPTO_SIGN_PRIMITIVE, 			edwards25519sha512batch).
--define(CRYPTO_SIGN_IMPLEMENTATION, 		"crypto_sign/edwards25519sha512batch/ref").
--define(CRYPTO_SIGN_VERSION, 			"-").
+-define(CRYPTO_SIGN_PRIMITIVE, 			ed25519).
 
 -define(CRYPTO_SECRETBOX_KEYBYTES, 		32).
 -define(CRYPTO_SECRETBOX_NONCEBYTES, 		24).
 -define(CRYPTO_SECRETBOX_ZEROBYTES, 		32).
 -define(CRYPTO_SECRETBOX_BOXZEROBYTES, 		16).
 -define(CRYPTO_SECRETBOX_PRIMITIVE, 		xsalsa20poly1305).
--define(CRYPTO_SECRETBOX_IMPLEMENTATION, 	"crypto_secretbox/xsalsa20poly1305/ref").
--define(CRYPTO_SECRETBOX_VERSION, 		"-").
 
 -define(CRYPTO_STREAM_KEYBYTES, 		32).
 -define(CRYPTO_STREAM_NONCEBYTES, 		24).
 -define(CRYPTO_STREAM_PRIMITIVE, 		xsalsa20).
--define(CRYPTO_STREAM_IMPLEMENTATION, 		"crypto_stream/xsalsa20/ref").
--define(CRYPTO_STREAM_VERSION, 			"-").
 
 -define(CRYPTO_AUTH_BYTES, 			32).
 -define(CRYPTO_AUTH_KEYBYTES, 			32).
 -define(CRYPTO_AUTH_PRIMITIVE, 			hmacsha512256).
--define(CRYPTO_AUTH_IMPLEMENTATION, 		"crypto_auth/hmacsha512256/ref").
--define(CRYPTO_AUTH_VERSION, 			"-").
 
 -define(CRYPTO_ONETIMEAUTH_BYTES, 		16).
 -define(CRYPTO_ONETIMEAUTH_KEYBYTES, 		32).
 -define(CRYPTO_ONETIMEAUTH_PRIMITIVE, 		poly1305).
--define(CRYPTO_ONETIMEAUTH_IMPLEMENTATION, 	"crypto_onetimeauth/poly1305/amd64").
--define(CRYPTO_ONETIMEAUTH_VERSION, 		"-").
 
 -define(CRYPTO_HASH_BYTES, 			64).
 -define(CRYPTO_HASH_PRIMITIVE, 			sha512).
--define(CRYPTO_HASH_IMPLEMENTATION, 		"crypto_hash/sha512/ref").
--define(CRYPTO_HASH_VERSION, 			"-").
 
 -endif.

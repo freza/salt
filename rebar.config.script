@@ -9,7 +9,7 @@ Arch = erlang:system_info(system_architecture),
 lists:keymerge(1,
     lists:keysort(1, [
         {port_env, [{"DRV_CFLAGS", "$DRV_CFLAGS -Wall -Werror -I/usr/local/include/sodium"},
-		    {"DRV_LDFLAGS", "$DRV_LDFLAGS -lsodium"}]},
+		    {"DRV_LDFLAGS", "$DRV_LDFLAGS -L/usr/local/lib -Wl,-R/usr/local/lib -lsodium"}]},
         {port_specs, [{filename:join(["priv", Arch, "salt_nif.so"]), ["c_src/salt_nif.c"]}]},
         {pre_hooks, [{clean, "rm -fr ebin erl_crash.dump c_src/salt_nif.o priv/" ++ Arch}]}
     ]),
