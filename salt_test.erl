@@ -60,7 +60,7 @@ orly() ->
 box() ->
     {Apk, Ask} = verbose(salt, crypto_box_keypair, []),
     {Bpk, Bsk} = verbose(salt, crypto_box_keypair, []),
-    Nc = <<1:24/integer-unit:8>>,
+    Nc = salt:crypto_random_bytes(24),
     Pt = <<"Hello Bob, message from Alice.">>,
     boxself(Apk, Ask, Nc, Pt),
     boxpeer(Apk, Ask, Bpk, Bsk, Nc, Pt),
@@ -87,27 +87,27 @@ sign() ->
     compare({ok, Pm}, verbose(salt, crypto_sign_open, [Sm, Pk])).
 
 secretbox() ->
-    Sk = <<1:32/integer-unit:8>>,
-    Nc = <<1:24/integer-unit:8>>,
+    Sk = salt:crypto_random_bytes(32),
+    Nc = salt:crypto_random_bytes(24),
     Pt = <<"Secret message.">>,
     Ct = verbose(salt, crypto_secretbox, [Pt, Nc, Sk]),
     compare({ok, Pt}, verbose(salt, crypto_secretbox_open, [Ct, Nc, Sk])).
 
 stream() ->
-    Sk = <<1:32/integer-unit:8>>,
-    Nc = <<1:24/integer-unit:8>>,
+    Sk = salt:crypto_random_bytes(32),
+    Nc = salt:crypto_random_bytes(24),
     Pt = <<"Secret message.">>,
     Ct = verbose(salt, crypto_stream_xor, [Pt, Nc, Sk]),
     compare(Pt, verbose(salt, crypto_stream_xor, [Ct, Nc, Sk])).
 
 auth() ->
-    Sk = <<1:32/integer-unit:8>>,
+    Sk = salt:crypto_random_bytes(32),
     Pt = <<"Authentic message.">>,
     Au = verbose(salt, crypto_auth, [Pt, Sk]),
     compare(authenticated, verbose(salt, crypto_auth_verify, [Au, Pt, Sk])).
 
 onetimeauth() ->
-    Sk = <<1:32/integer-unit:8>>,
+    Sk = salt:crypto_random_bytes(32),
     Pt = <<"Authentic message.">>,
     Au = verbose(salt, crypto_onetimeauth, [Pt, Sk]),
     compare(authenticated, verbose(salt, crypto_onetimeauth_verify, [Au, Pt, Sk])).
