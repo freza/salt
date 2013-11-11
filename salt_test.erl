@@ -42,7 +42,7 @@ orly() ->
     io:nl(), io:nl(),
     title("Trying out crypto_box functions."),
     box(),
-    %% XXX how to test crypto_scalarmult?
+    %% XXX any sensible way to try out scalarmult?
     title("Trying out crypto_sign functions."),
     sign(),
     title("Trying out crypto_secretbox functions."),
