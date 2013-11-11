@@ -12,8 +12,8 @@
 
   Most of the crypto is performed directly on scheduler threads without visible
   side effects (aside from allocation of result terms) and without performing
-  any system calls. Upper bound on execution latency is imposed indirectly by
-  limiting input block sizes throughout.
+  any system or library calls (outside libsodium). Upper bound on execution
+  latency is imposed indirectly by limiting input block sizes throughout.
 
   This is not considered to be a problematic decision as it is likely that
   networking applications will likewise prefer to limit maximum PDU size, and
@@ -52,8 +52,7 @@
   The original NaCl code was released by Daniel J. Bernstein, Tanja Lange,
   Peter Schwabe and contributors into the public domain.
 
-  Libsodium, by Frank Denis and contributors, is subject to a MIT-style
-  license.
+  Libsodium, by Frank Denis and contributors, is subject to ISC license.
 
   Salt, by Jachym Holecek, is subject to a 2-clause BSD license.
 
