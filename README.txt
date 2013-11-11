@@ -1,32 +1,33 @@
 ### About.
 
-  This package provides Erlang bindings for 'libsodium', a portable packaging of NaCl
-  cryptography library. The bindings are pretty complete, covering all public APIs of
-  all chosen primitives through NIF code in 'c_src/salt_nif.c' and supporting Erlang
-  modules.
+  This package provides Erlang bindings for 'libsodium', a portable packaging
+  of NaCl cryptography library. The bindings are pretty complete, covering all
+  public APIs of all chosen primitives through NIF code in 'c_src/salt_nif.c'
+  and supporting Erlang modules.
 
-  NaCl provides high-speed cryptographic primitives whose implementations are resilient
-  to side-channel attacks by design. The API exposes high-level operations with clear
-  security contracts and minimal space for user to introduce undue risks accidentally.
+  NaCl provides high-speed cryptographic primitives whose implementations
+  are resilient to side-channel attacks by design. The API exposes high-level
+  operations with clear security contracts and minimal space for user to
+  introduce undue risks accidentally.
 
-  Most of the crypto is performed directly on scheduler threads without visible side
-  effects (aside from allocation of result terms) and without performing any system
-  calls. Upper bound on execution latency is imposed indirectly by limiting input
-  block sizes throughout.
+  Most of the crypto is performed directly on scheduler threads without visible
+  side effects (aside from allocation of result terms) and without performing
+  any system calls. Upper bound on execution latency is imposed indirectly by
+  limiting input block sizes throughout.
 
-  This is not considered to be a problematic decision as it is likely that networking
-  applications will likewise prefer to limit maximum PDU size, and storage applications
-  are likely to operate on blocks of constant size. Fine tuning of the limit may be
-  desirable looking forward, current value of 16KB is chosen arbitrarily. Future changes
-  should be supported by measurements on relevant CPUs with the target of one reduction
-  per operation, or cca 1ms. The author defines "relevant CPUs" as "enteprise class
-  amd64 chips".
+  This is not considered to be a problematic decision as it is likely that
+  networking applications will likewise prefer to limit maximum PDU size, and
+  storage applications are likely to operate on blocks of constant size. Fine
+  tuning of the limit may be desirable looking forward, current value of 16KB
+  is chosen arbitrarily. Future changes should be supported by measurements on
+  relevant CPUs with the target of one reduction per operation, or cca 1ms.
+  The author defines "relevant CPUs" as "enteprise class amd64 chips" :-).
 
-  Key generation and RNG routines are blocking, or at least potentially blocking, and
-  are therefore perfomed on a worker thread via call too 'salt_server'. This means all
-  these calls get serialized and incur somewhat higher latency. It is reasonable to
-  expect key generation to only be performed at relatively low frequencies. The same
-  hopefully applies to random bytes generation.
+  Key generation and RNG routines are (at least potentially) blocking and
+  are therefore perfomed on a worker thread via call too 'salt_server'. This
+  means all these calls get serialized and incur somewhat higher latency. It
+  is reasonable to expect key generation to only be performed at relatively
+  low frequencies. The same hopefully applies to random bytes generation.
 
 ### References.
 
@@ -76,13 +77,15 @@
 
 ### TODO
 
-  * Verify current message/block size limit of 16KB corresponds to reasonable latency.
+  * Verify current message/block size limit of 16KB corresponds to reasonable
+    latency.
   * Also export BLAKE2b hash function, despite not having "chosen" status.
-  * Perform 'libsodium' initialization from worker thread before app startup completes.
+  * Perform 'libsodium' initialization from worker thread before app startup
+    completes.
 
 ### Data types.
 
-  XXX document variables below, pretty obvious what they are, also see include/salt.hrl
+  XXX document variables below, pretty obvious, also see include/salt.hrl
 
 ### Public-key cryptography.
 
