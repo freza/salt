@@ -49,10 +49,11 @@
 
 ### Credits and Licensing.
 
-  The original NaCl code was released by Daniel J. Bernstein, Tanja Lange, Peter
-  Schwabe and contributors into the public domain.
+  The original NaCl code was released by Daniel J. Bernstein, Tanja Lange,
+  Peter Schwabe and contributors into the public domain.
 
-  Libsodium, by Frank Denis and contributors, is subject to a MIT-style license.
+  Libsodium, by Frank Denis and contributors, is subject to a MIT-style
+  license.
 
   Salt, by Jachym Holecek, is subject to a 2-clause BSD license.
 
