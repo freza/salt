@@ -27,6 +27,9 @@
 
 -module(salt_test).
 -export([all/0]).
+-export([hexdump_to_binary/1]).
+
+%%% Run simple sanity checks.
 
 all() ->
     case application:start(salt) of
@@ -55,7 +58,7 @@ orly() ->
     onetimeauth(),
     title("Success.").
 
-%%%
+%%% Individual tests.
 
 box() ->
     {Apk, Ask} = verbose(salt, crypto_box_keypair, []),
@@ -112,7 +115,7 @@ onetimeauth() ->
     Au = verbose(salt, crypto_onetimeauth, [Pt, Sk]),
     compare(authenticated, verbose(salt, crypto_onetimeauth_verify, [Au, Pt, Sk])).
 
-%%%
+%%% Test utilities.
 
 compare(X, Y) when X /= Y ->
     io:format("==== Unexpected result. ====~n~s~s~n~n", [format(X, "LHS: "), format(Y, "RHS: ")]),
@@ -155,3 +158,30 @@ nibble(N) when N >= 0, N =< 9 ->
     $0 + N;
 nibble(N) when N >= 10, N =< 15 ->
     $A + (N - 10).
+
+%%% Commandline utility -- decode hexdumps produced by tests.
+
+hexdump_to_binary(L) when is_list(L) ->
+    hexdump_to_binary(list_to_binary(L));
+hexdump_to_binary(<<"0x", B/binary>>) ->
+    decode_hexdump(B);
+hexdump_to_binary(<<>>) ->
+    <<>>.
+
+decode_hexdump(<<N1:8, N2:8, B/binary>>) ->
+    O1 = decode_nibble(N1),
+    O2 = decode_nibble(N2),
+    OB = decode_hexdump(B),
+    <<O1:4, O2:4, OB/binary>>;
+decode_hexdump(<<N:8>>) ->
+    O1 = decode_nibble(N),
+    <<O1:4, 0:4>>;
+decode_hexdump(<<>>) ->
+    <<>>.
+
+decode_nibble(C) when C >= $0, C =< $9 ->
+    C - $0;
+decode_nibble(C) when C >= $a, C =< $f ->
+    (C - $a) + 10;
+decode_nibble(C) when C >= $A, C =< $F ->
+    (C - $A) + 10.

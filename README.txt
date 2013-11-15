@@ -8,7 +8,9 @@
   NaCl provides high-speed cryptographic primitives whose implementations
   are resilient to side-channel attacks by design. The API exposes high-level
   operations with clear security contracts and minimal space for user to
-  introduce undue risks accidentally.
+  introduce undue risks accidentally. This is ideal for the working engineer
+  wishing to improve upon security aspects of his/her designs but unable or
+  unwilling to engage in fragile low-level cryptoplumbing.
 
   Most of the crypto is performed directly on scheduler threads without visible
   side effects (aside from allocation of result terms) and without performing
@@ -54,7 +56,8 @@
 
   Libsodium, by Frank Denis and contributors, is subject to ISC license.
 
-  Salt, by Jachym Holecek, is subject to a 2-clause BSD license.
+  Salt, by Jachym Holecek and contributors, is subject to a 2-clause BSD
+  license.
 
 ### Compiling.
 
