@@ -931,7 +931,7 @@ salt_onetimeauth(nif_heap_t *hp, int argc, const nif_term_t argv[])
 	if (! enif_alloc_binary(crypto_onetimeauth_BYTES, &au))
 		return (BADARG);
 
-	(void)crypto_auth(au.data, ms.data, ms.size, sk.data);
+	(void)crypto_onetimeauth(au.data, ms.data, ms.size, sk.data);
 	return (enif_make_binary(hp, &au));
 }
 
@@ -967,7 +967,7 @@ salt_onetimeauth_verify(nif_heap_t *hp, int argc, const nif_term_t argv[])
 		return (BADARG);
 
 	/* Perform the crypto. */
-	if (crypto_auth_verify(au.data, ms.data, ms.size, sk.data) != 0)
+	if (crypto_onetimeauth_verify(au.data, ms.data, ms.size, sk.data) != 0)
 		return (enif_make_atom(hp, "forged_or_garbled"));
 
 	return (enif_make_atom(hp, "authenticated"));
