@@ -722,7 +722,7 @@ salt_secretbox_open(nif_heap_t *hp, int argc, const nif_term_t argv[])
 		return (BADARG);
 
 	/* Check constraints on size and zero prefixing. */
-	if (ct.size < crypto_secretbox_BOXZEROBYTES || ct.size > SALT_MAX_MESSAGE_SIZE)
+	if (ct.size < crypto_secretbox_BOXZEROBYTES || ct.size > SALT_MAX_MESSAGE_SIZE) /* */
 		return (BADARG);
 	if (memcmp((const void *)ct.data, &salt_secretbox_boxzerobytes[0], crypto_secretbox_BOXZEROBYTES) != 0)
 		return (BADARG);
