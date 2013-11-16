@@ -45,7 +45,19 @@
 %%%
 
 load() ->
-    Path = filename:join([code:priv_dir(salt), erlang:system_info(system_architecture), "salt_nif"]),
+    %% get local priv dir if we test from the shell
+    PrivDir = case code:priv_dir(salt) of
+        {error, _} ->
+            EbinDir = filename:dirname(code:which(?MODULE)),
+            AppPath = filename:dirname(EbinDir),
+            filename:join(AppPath, "priv");
+        Dir ->
+            Dir
+    end,
+
+    Path = filename:join([PrivDir,
+                          erlang:system_info(system_architecture),
+                          "salt_nif"]),
     erlang:load_nif(Path, 0).
 
 %%% Exported from salt_nif.c.
