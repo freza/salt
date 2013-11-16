@@ -34,6 +34,7 @@ build() {
     if ! test -f $LIBSODIUM_DIR/Makefile; then
         ./autogen.sh
         ./configure --disable-pie \
+                    --disable-ssp \
                     --disable-shared \
                     --enable-static
     fi
