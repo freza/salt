@@ -12,8 +12,6 @@ LIBSODIUM_VER="f553bb4bf22a6a8e4fa5f69cfbf91ce95327b790",
 LIBSODIUM_CFLAGS="-Ic_src/libsodium-" ++ LIBSODIUM_VER ++"/src/libsodium/include/sodium",
 LIBSODIUM_LDLAGS="c_src/libsodium-" ++ LIBSODIUM_VER ++ "/src/libsodium/.libs/libsodium.a",
 
-io:format("flags ~p~n", ["$DRV_LDFLAGS " ++ LIBSODIUM_CFLAGS]),
-
 %% Augment configuration from rebar.config with NIF settings.
 lists:keymerge(1,
 lists:keysort(1, [
