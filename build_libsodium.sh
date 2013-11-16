@@ -19,7 +19,7 @@ clean() {
         cd $LIBSODIUM_DIR && make clean
     fi
 }
-    
+
 
 build() {
     echo "==> build libsodium"
@@ -29,11 +29,13 @@ build() {
     fi
 
     cd $LIBSODIUM_DIR
-    
+
     # configure
     if ! test -f $LIBSODIUM_DIR/Makefile; then
         ./autogen.sh
-        ./configure --disable-shared --enable-static
+        ./configure --disable-pie \
+                    --disable-shared \
+                    --enable-static
     fi
 
     make
