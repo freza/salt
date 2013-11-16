@@ -1,3 +1,6 @@
+%-*-Mode:erlang;coding:utf-8;tab-width:4;c-basic-offset:4;indent-tabs-mode:()-*-
+% ex: set ft=erlang fenc=utf-8 sts=4 ts=4 sw=4 et:
+%
 %%%
 %%% Reconcile NaCl's idea of architecture name with Erlang's, set compiler
 %%% flags and paths for NIF compilation.
@@ -5,12 +8,19 @@
 
 Arch = erlang:system_info(system_architecture),
 
+LIBSODIUM_VER="f553bb4bf22a6a8e4fa5f69cfbf91ce95327b790",
+LIBSODIUM_CFLAGS="-Ic_src/libsodium-" ++ LIBSODIUM_VER ++"/src/libsodium/include/sodium",
+LIBSODIUM_LDLAGS="c_src/libsodium-" ++ LIBSODIUM_VER ++ "/src/libsodium/.libs/libsodium.a",
+
 %% Augment configuration from rebar.config with NIF settings.
 lists:keymerge(1,
-    lists:keysort(1, [
-        {port_env, [{"DRV_CFLAGS", "$DRV_CFLAGS -Wall -Werror -I/usr/local/include/sodium"},
-		    {"DRV_LDFLAGS", "$DRV_LDFLAGS -L/usr/local/lib -Wl,-R/usr/local/lib -lsodium"}]},
-        {port_specs, [{filename:join(["priv", Arch, "salt_nif.so"]), ["c_src/salt_nif.c"]}]},
-        {pre_hooks, [{clean, "rm -fr ebin erl_crash.dump salt_test.beam c_src/salt_nif.o priv/" ++ Arch}]}
-    ]),
-    lists:keysort(1, CONFIG)).
+lists:keysort(1, [
+{port_env, [{"DRV_CFLAGS", "$DRV_CFLAGS  -Wall -Werror " ++ LIBSODIUM_CFLAGS},
+            {"DRV_LDFLAGS", "$DRV_LDFLAGS " ++ LIBSODIUM_LDLAGS}]},
+    {port_specs, [{filename:join(["priv", Arch, "salt_nif.so"]),
+                  ["c_src/salt_nif.c"]}]},
+    {pre_hooks, [{compile, "./build_libsodium.sh"},
+                 {clean, "rm -fr ebin erl_crash.dump salt_test.beam c_src/salt_nif.o priv/" ++ Arch},
+                 {clean, "./build_libsodium.sh clean"}]}
+]),
+lists:keysort(1, CONFIG)).
