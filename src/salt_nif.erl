@@ -51,73 +51,73 @@ load() ->
 %%% Exported from salt_nif.c.
 
 start() ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_box_keypair(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_box(_, _, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_box_open(_, _, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_box_beforenm(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_box_afternm(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_box_open_afternm(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_scalarmult(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_scalarmult_base(_) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_sign_keypair(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_sign(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_sign_open(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_secretbox(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_secretbox_open(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_stream(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_stream_xor(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_auth(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_auth_verify(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_onetimeauth(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_onetimeauth_verify(_, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_hash(_) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_verify_16(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_verify_32(_, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).
 
 salt_random_bytes(_, _, _, _) ->
-    error(salt_not_loaded).
+    erlang:nif_error(salt_not_loaded).

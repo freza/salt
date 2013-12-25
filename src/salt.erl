@@ -46,85 +46,115 @@
 %%% Public-key cryptography.
 
 %% Public-key authenticated encryption.
+
+-type resp_box() :: badarg | binary().
+-type resp_box_open() :: badarg | forged_or_garbled | {ok, binary()}.
+-type resp_auth() :: badarg | forged_or_garbled | authenticated.
+-type resp_bool() :: equal | not_equal.
+
+-spec crypto_box_keypair() -> {binary(), binary()}.
 crypto_box_keypair() ->
     salt_server:make_box_keypair().
 
+-spec crypto_box(iodata(), binary(), binary(), binary()) -> resp_box().
 crypto_box(Plain_text, Nonce, Public_key, Secret_key) ->
     salt_nif:salt_box([crypto_box_zerobytes() | Plain_text], Nonce, Public_key, Secret_key).
 
+-spec crypto_box_open(iodata(), binary(), binary(), binary()) ->
+        badarg | forged_or_garbled | {ok, binary()}.
 crypto_box_open(Cipher_text, Nonce, Public_key, Secret_key) ->
     salt_nif:salt_box_open([crypto_box_boxzerobytes() | Cipher_text], Nonce, Public_key, Secret_key).
 
+-spec crypto_box_beforenm(binary(), binary()) -> resp_box().
 crypto_box_beforenm(Public_key, Secret_key) ->
     salt_nif:salt_box_beforenm(Public_key, Secret_key).
 
+-spec crypto_box_afternm(iodata(), binary(), binary()) -> resp_box().
 crypto_box_afternm(Plain_text, Nonce, Context) ->
     salt_nif:salt_box_afternm([crypto_box_zerobytes() | Plain_text], Nonce, Context).
 
+-spec crypto_box_open_afternm(iodata(), binary(), binary()) -> resp_box_open().
 crypto_box_open_afternm(Cipher_text, Nonce, Context) ->
     salt_nif:salt_box_open_afternm([crypto_box_boxzerobytes() | Cipher_text], Nonce, Context).
 
 %% Scalar multiplication. NB: Opaque representation of integers and group elements on fixed-length octet strings.
+-spec crypto_scalarmult(binary(), binary()) -> resp_box().
 crypto_scalarmult(Integer, Group_p) ->
     salt_nif:salt_scalarmult(Integer, Group_p).
 
+-spec crypto_scalarmult_base(binary()) -> resp_box().
 crypto_scalarmult_base(Integer) ->
     salt_nif:salt_scalarmult(Integer).
 
 %% Signatures.
+-spec crypto_sign_keypair() -> {binary(), binary()}.
 crypto_sign_keypair() ->
     salt_server:make_sign_keypair().
 
+-spec crypto_sign(iodata(), binary()) -> resp_box().
 crypto_sign(Message, Secret_key) ->
-    salt_nif:salt_sign(Message, Secret_key).
+    salt_nif:salt_sign([Message], Secret_key).
 
+-spec crypto_sign_open(iodata(), binary()) -> resp_box_open().
 crypto_sign_open(Signed_msg, Public_key) ->
-    salt_nif:salt_sign_open(Signed_msg, Public_key).
+    salt_nif:salt_sign_open([Signed_msg], Public_key).
 
 %%% Secret-key cryptography.
 
 %% Authenticated encryption.
+-spec crypto_secretbox(iodata(), binary(), binary()) -> resp_box().
 crypto_secretbox(Plain_text, Nonce, Secret_key) ->
     salt_nif:salt_secretbox([crypto_secretbox_zerobytes() | Plain_text], Nonce, Secret_key).
 
+-spec crypto_secretbox_open(iodata(), binary(), binary()) -> resp_box_open().
 crypto_secretbox_open(Cipher_text, Nonce, Secret_key) ->
     salt_nif:salt_secretbox_open([crypto_secretbox_boxzerobytes() | Cipher_text], Nonce, Secret_key).
 
 %% Encryption.
+-spec crypto_stream(pos_integer(), binary(), binary()) -> resp_box().
 crypto_stream(Byte_cnt, Nonce, Secret_key) ->
     salt_nif:salt_stream(Byte_cnt, Nonce, Secret_key).
 
+-spec crypto_stream_xor(binary(), binary(), binary()) -> resp_box().
 crypto_stream_xor(Plain_text, Nonce, Secret_key) ->
     salt_nif:salt_stream_xor(Plain_text, Nonce, Secret_key).
 
 %% Message authentication.
+-spec crypto_auth(iodata(), binary()) -> resp_box().
 crypto_auth(Message, Secret_key) ->
-    salt_nif:salt_auth(Message, Secret_key).
+    salt_nif:salt_auth([Message], Secret_key).
 
+-spec crypto_auth_verify(binary(), iodata(), binary()) -> resp_auth().
 crypto_auth_verify(Authenticator, Message, Secret_key) ->
-    salt_nif:salt_auth_verify(Authenticator, Message, Secret_key).
+    salt_nif:salt_auth_verify(Authenticator, [Message], Secret_key).
 
 %% Single-message authentication.
+-spec crypto_onetimeauth(iodata(), binary()) -> resp_auth().
 crypto_onetimeauth(Message, Secret_key) ->
-    salt_nif:salt_onetimeauth(Message, Secret_key).
+    salt_nif:salt_onetimeauth([Message], Secret_key).
 
+-spec crypto_onetimeauth_verify(binary(), iodata(), binary()) -> resp_auth().
 crypto_onetimeauth_verify(Authenticator, Message, Secret_key) ->
-    salt_nif:salt_onetimeauth_verify(Authenticator, Message, Secret_key).
+    salt_nif:salt_onetimeauth_verify(Authenticator, [Message], Secret_key).
 
 %%% Low-level functions.
 
 %% Hashing.
+-spec crypto_hash(iodata()) -> resp_box().
 crypto_hash(Message) ->
-    salt_nif:salt_hash(Message).
+    salt_nif:salt_hash([Message]).
 
 %% String comparison.
+-spec crypto_verify_16(binary(), binary()) -> resp_bool().
 crypto_verify_16(Bin_x, Bin_y) ->
     salt_nif:salt_verify_16(Bin_x, Bin_y).
 
+-spec crypto_verify_32(binary(), binary()) -> resp_bool().
 crypto_verify_32(Bin_x, Bin_y) ->
     salt_nif:salt_verify_32(Bin_x, Bin_y).
 
 %% Random number generator.
+-spec crypto_random_bytes(pos_integer()) -> binary().
 crypto_random_bytes(Cnt) ->
     salt_server:make_random_bytes(Cnt).
 
