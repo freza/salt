@@ -49,7 +49,7 @@ make_sign_keypair() ->
     case gen_server:call(?MODULE, make_sign_keypair) of
 	{ok, Pk_sk} ->
 	    Pk_sk;
-	{error, Rsn} ->
+	{_error, Rsn} ->
 	    exit({salt, crypto_sign_keypair, Rsn})
     end.
 
@@ -68,7 +68,10 @@ make_random_bytes(Cnt) ->
 	 }).
 
 init([]) ->
-    ok = salt_nif:load(),
+    case salt_nif:load() of
+        ok -> ok;
+        {error, {reload, _}} -> ok
+    end,
     Pcb = salt_nif:start(),
     {ok, #state{pcb = Pcb}}.
 
