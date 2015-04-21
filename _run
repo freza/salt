@@ -3,7 +3,7 @@
 ### Not documented as such, but inhibits annoying crash dumps.
 export ERL_CRASH_DUMP=""
 
-${HOME}/R16B01/bin/erl -pa $(pwd)/ebin -boot start_sasl -noshell \
+erl -pa $(pwd)/ebin -boot start_sasl -noshell \
 	-eval 'c:c(salt_test).' \
 	-eval 'salt_test:all().' \
 	-eval 'init:stop().'
