@@ -3,5 +3,5 @@
 ### Not documented as such, but inhibits annoying crash dumps.
 export ERL_CRASH_DUMP=""
 
-${HOME}/R16B01/bin/erl -pa $(pwd) -pa $(pwd)/ebin -boot start_sasl \
+erl -pa $(pwd) -pa $(pwd)/ebin -boot start_sasl \
 	-eval 'application:start(salt).'
